@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project name="aspNETserve" default="build" xmlns="http://nant.sf.net/release/0.85/nant.xsd">
+  <property name="nant.settings.currentframework" value="net-3.5" />
+  
+  <target name="build">
+    <msbuild project="aspNETserve.sln">
+      <property name="Configuration" value="Release"/>
+      <property name="Platform" value="Any CPU" />
+    </msbuild>
+    <msbuild project="aspNETserve.sln">
+      <property name="Configuration" value="Debug"/>
+      <property name="Platform" value="Any CPU" />
+    </msbuild>
+  </target>
+
+  <target name="BuildInstaller" depends="build">
+    <delete dir="./setup/bin" />
+    <mkdir dir="./setup/bin" />
+    <copy todir="./setup/bin">
+      <fileset basedir="./aspNETserve/bin/Release">
+        <include name="*.*" />
+      </fileset>
+    </copy>
+    <copy todir="./setup/bin">
+      <fileset basedir="./aspNETserve.Core/bin/Release">
+        <include name="*.*" />
+      </fileset>
+    </copy>
+    <copy todir="./setup/bin">
+      <fileset basedir="./aspNETserve.Ice/bin/Release">
+        <include name="*.*" />
+      </fileset>
+    </copy>
+    <copy todir="./setup/bin">
+      <fileset basedir="./SimpleWebServer/bin/Release">
+        <include name="*.*"/>
+      </fileset>
+    </copy>
+    <copy file="License.rtf" tofile="./setup/bin/License.rtf" />
+    <exec program="./tools/wix/candle.exe">
+      <arg value="-out" />
+      <arg value="./setup/bin/aspNETserve.wixobj" />
+      <arg value="./setup/aspNETserve.wxs" />
+    </exec>
+    <!-- path\lib\wixui.wixlib -loc path\lib\WixUI_en-us.wxl -->
+    <exec program="./tools/wix/light.exe">
+      <arg value="-b" />
+      <arg value="./setup" />
+      <arg value="-out" />
+      <arg value="./setup/bin/aspNETserve.msi" />
+      <arg value="./setup/bin/aspNETserve.wixobj" />
+      <arg value="./tools/wix/wixui.wixlib" />
+      <arg value="-loc" />
+      <arg value="./tools/wix/WixUI_en-us.wxl" />
+    </exec>
+  </target>
+
+  <target name="GacInstall">
+    <!-- "C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\Bin\gacutil.exe" -i aspNETserve.Core.dll -->
+    <exec program="gacutil.exe">
+      <arg value="-i" />
+      <arg value="./aspNETserve.Core/bin/Debug/aspNETserve.Core.dll" />
+    </exec>
+  </target>
+
+  <target name="GacUninstall">
+    <exec program="gacutil.exe">
+      <arg value="/u" />
+      <arg value="aspNETserve.Core" />
+    </exec>
+  </target>
+
+  <target name="GacReinstall" depends="GacUninstall, GacInstall" />
+
+  <target name="UnitTest" depends="build">
+    <exec program="./References/NUnit 2.4.3/bin/nunit-console.exe">
+      <arg value="./UnitTests/bin/Debug/UnitTests.dll" />
+    </exec>
+  </target>
+
+  <target name="InstallService">
+    <exec program="C:\Windows\System32\sc.exe">
+      <arg value="\\." />
+      <arg value="create" />
+      <arg value="aspNETserve.Ice" />
+      <arg value="binPath= ./aspNETserve.Ice/bin/Release/aspNETserve.Ice.exe" />
+    </exec>
+  </target>
+
+  <target name="UninstallService">
+    <exec program="C:\Windows\System32\sc.exe">
+      <arg value="\\." />
+      <arg value="delete" />
+      <arg value="aspNETserve.Ice" />
+    </exec>
+  </target>
+</project>

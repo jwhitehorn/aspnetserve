@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (c) 2006-2008, Jason Whitehorn (jason.whitehorn@gmail.com)
+  All rights reserved.
+  
+  Source code and binaries distributed under the terms of the included
+  license, see license.txt for details.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="server">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="application">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="domain" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="name" type="xs:string" />
+                  <xs:attribute name="virtualPath" type="xs:string" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="endpoint" minOccurs="1" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="ip" type="xs:string" />
+                  <xs:attribute name="port" type="xs:string" />
+                  <xs:attribute name="secure" type="xs:string" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="physicalPath" type="xs:string" />
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
