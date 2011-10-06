@@ -1,0 +1,5 @@
+*.suo
+_ReSharper*
+.DS_Store
+*/obj/
+*/bin/
